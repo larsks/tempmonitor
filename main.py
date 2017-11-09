@@ -79,4 +79,4 @@ client.publish('sensor/{}/humidity'.format(mqtt_id),
                bytes(str(final[1]), 'utf8'))
 client.disconnect()
 
-sleep.deepsleep(int(config['interval']) * 1000)
+sleep.deepsleep(int(config['interval']))
