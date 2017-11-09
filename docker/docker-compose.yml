@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+
+  influxdb:
+    image: influxdb
+    volumes:
+      - metrics:/var/lib/influxdb
+
+  telegraf:
+    image: telegraf
+    network_mode: service:influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+volumes:
+  metrics:
+  grafana:
