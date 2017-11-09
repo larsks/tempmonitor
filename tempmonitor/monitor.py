@@ -7,7 +7,7 @@ import umqtt.robust as mqtt
 
 from machine import Pin
 
-import sleep
+from tempmonitor import sleep
 
 sta_if = network.WLAN(network.STA_IF)
 
