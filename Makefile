@@ -5,9 +5,9 @@ CONFIG = config.json
 SRCS = boot.py \
        main.py \
        tempmonitor/__init__.py \
+       tempmonitor/board.py \
        tempmonitor/discover.py \
        tempmonitor/monitor.py \
-       tempmonitor/sleep.py \
        tempmonitor/battery.py \
        tempmonitor/common.py
 

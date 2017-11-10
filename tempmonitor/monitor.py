@@ -1,13 +1,9 @@
-import dht
 import machine
 import network
-import time
 import umqtt.robust as mqtt
 
-from machine import Pin
-
+from tempmonitor import board
 from tempmonitor.common import macaddr
-from tempmonitor import sleep
 
 sta_if = network.WLAN(network.STA_IF)
 
@@ -15,13 +11,23 @@ sta_if = network.WLAN(network.STA_IF)
 class Monitor():
     def __init__(self, config):
         self.config = config
-        self.init_dht()
+        self.init_board()
 
     def run(self):
+        self.board.led_on()
         self.init_network()
         self.init_mqtt()
 
-        sample = next(self.sample())
+        try:
+            self.sample_and_report()
+        except OSError as err:
+            print('! failed to sample and report data ({})'.format(err))
+
+        self.board.led_off()
+        self.board.deepsleep(int(self.config['interval']))
+
+    def sample_and_report(self):
+        sample = self.board.read_dht()
 
         for k, v in sample.items():
             if 'calibration' in self.config:
@@ -41,10 +47,6 @@ class Monitor():
                 print('! failed to publish data')
 
         self.mqtt_client.disconnect()
-        self.finish()
-
-    def finish(self):
-        sleep.deepsleep(int(self.config['interval']))
 
     def init_network(self):
         print('* configuring network')
@@ -72,34 +74,10 @@ class Monitor():
         print('# connecting to mqtt server {}'.format(server))
         client = mqtt.MQTTClient(self.mqtt_id,
                                  self.config['mqtt_server'])
-        try:
-            client.connect()
-        except OSError:
-            print('! failed to connect to client')
-            self.finish()
+        client.connect()
         print('# connected to mqtt server {}'.format(server))
 
         self.mqtt_client = client
 
-    def init_dht(self):
-        dht_pin = self.config['dht_pin']
-        print('* temperature sensor on pin {}'.format(dht_pin))
-        self.dht = dht.DHT22(Pin(dht_pin))
-
-    def sample(self):
-        while True:
-            try:
-                self.dht.measure()
-                tmp, hum = self.dht.temperature(), self.dht.humidity()
-                print('# read temperature {}, humidity {}'
-                      .format(tmp, hum))
-                yield {
-                    'temperature': tmp,
-                    'humidity': hum,
-                }
-            except OSError:
-                print('! failed to read dht22, retrying')
-
-            time.sleep(2)
-
-        print('* read temperature {}, humidity {}'.format(tmp, hum))
+    def init_board(self):
+        self.board = board.Board()
