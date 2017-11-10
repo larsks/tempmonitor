@@ -1,22 +1,31 @@
+try:
+    import binascii
+except ImportError:
+    import ubinascii as binascii
+
 import dht
 import machine
 from machine import Pin
+import network
 import time
 
-
-DEFAULT_DHT_PIN = 4
-DEFAULT_LED_PIN = 2
+import hwconf
 
 
 class Board():
 
     def __init__(self, dht_pin=None, led_pin=None):
-        self._dht_pin = dht_pin if dht_pin is not None else DEFAULT_DHT_PIN
-        self._led_pin = led_pin if led_pin is not None else DEFAULT_LED_PIN
+        self._dht_pin = dht_pin if dht_pin is not None else hwconf.dht_pin
+        self._led_pin = led_pin if led_pin is not None else hwconf.led_pin
         self._dht_last_read = time.time()
 
         self.init_dht()
         self.init_led()
+
+    def id(self):
+        sta_if = network.WLAN(network.STA_IF)
+        mac = sta_if.config('mac')
+        return binascii.hexlify(mac).decode('utf8')
 
     def init_dht(self):
         print('* temperature sensor on pin {}'.format(self._dht_pin))

@@ -1,17 +1,26 @@
+import json
 import machine
 import network
 import umqtt.robust as mqtt
 
+import hwconf
 from tempmonitor import board
-from tempmonitor.common import macaddr
 
 sta_if = network.WLAN(network.STA_IF)
+default_config = {
+    'topic': 'sensor',
+    'interval': 60,
+}
 
 
 class Monitor():
     def __init__(self, config):
-        self.config = config
+        self.config = default_config
+        self.config.update(config)
         self.init_board()
+
+    def init_board(self):
+        self.board = board.Board()
 
     def run(self):
         self.board.led_on()
@@ -29,23 +38,26 @@ class Monitor():
     def sample_and_report(self):
         sample = self.board.read_dht()
 
-        for k, v in sample.items():
-            if 'calibration' in self.config:
-                cal = self.config['calibration'].get(k, 0)
-                print('# calibration = {}'.format(cal))
-                v += cal
+        calibration = getattr(hwconf, 'calibration', {})
+        for k in list(sample.keys()):
+            cal = calibration.get(k, 0)
+            print('# {} calibration = {}'.format(k, cal))
+            sample['{}_raw'.format(k)] = sample[k]
+            sample['{}_calibration'.format(k)] = cal
+            sample[k] = sample['{}_raw'.format(k)] + cal
 
-            topic = 'sensor/{}/{}'.format(
-                self.mqtt_id, k)
-            value = bytes(str(v), 'utf8')
+        sample.update(self.config.get('tags', {}))
+        sample.update({
+            'sensor_id': self.board.id(),
+        })
 
-            print('* reporting {} = {}'.format(topic, value))
+        topic = '{topic}/{id}'.format(
+            id=self.board.id(), **self.config)
+        value = json.dumps(sample)
 
-            try:
-                self.mqtt_client.publish(topic, value)
-            except OSError:
-                print('! failed to publish data')
+        print('* reporting {} = {}'.format(topic, value))
 
+        self.mqtt_client.publish(topic, value)
         self.mqtt_client.disconnect()
 
     def init_network(self):
@@ -67,7 +79,8 @@ class Monitor():
 
     def init_mqtt(self):
         server = self.config['mqtt_server']
-        self.mqtt_id = macaddr()
+        self.mqtt_id = 'sensor-{}'.format(self.board.id())
+
         print('* reporting to {} as {}'.format(
             server, self.mqtt_id))
 
@@ -78,6 +91,3 @@ class Monitor():
         print('# connected to mqtt server {}'.format(server))
 
         self.mqtt_client = client
-
-    def init_board(self):
-        self.board = board.Board()

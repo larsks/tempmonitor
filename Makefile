@@ -4,12 +4,11 @@ AMPY = ampy -p $(PORT)
 CONFIG = config.json
 SRCS = boot.py \
        main.py \
+       hwconf.py \
        tempmonitor/__init__.py \
        tempmonitor/board.py \
        tempmonitor/discover.py \
-       tempmonitor/monitor.py \
-       tempmonitor/battery.py \
-       tempmonitor/common.py
+       tempmonitor/monitor.py
 
 all:
 
@@ -20,6 +19,12 @@ install: .lastbuild
 
 install-config:
 	$(AMPY) put $(CONFIG) config.json
+ifdef DEVICE
+	[ -f "config_$(DEVICE).json" ] && \
+		$(AMPY) put config_$(DEVICE).json config_local.json ||:
+	[ -f "hwconf_$(DEVICE).py" ] && \
+		$(AMPY) put hwconf_$(DEVICE).py hwconf_local.py ||:
+endif
 
 .lastbuild: $(SRCS)
 	$(AMPY) mkdir --exists-okay tempmonitor
