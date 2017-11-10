@@ -1,6 +1,7 @@
 PORT = /dev/ttyUSB1
 AMPY = ampy -p $(PORT)
 
+CONFIG = config.json
 SRCS = boot.py \
        main.py \
        tempmonitor/__init__.py \
@@ -8,7 +9,6 @@ SRCS = boot.py \
        tempmonitor/monitor.py \
        tempmonitor/sleep.py \
        tempmonitor/battery.py \
-       config.json \
        tempmonitor/common.py
 
 all:
@@ -17,6 +17,9 @@ check:
 	tox
 
 install: .lastbuild
+
+install-config:
+	$(AMPY) put $(CONFIG) config.json
 
 .lastbuild: $(SRCS)
 	$(AMPY) mkdir --exists-okay tempmonitor
