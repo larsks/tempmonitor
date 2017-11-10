@@ -1,8 +1,3 @@
-try:
-    import binascii
-except ImportError:
-    import ubinascii as binascii
-
 import dht
 import machine
 import network
@@ -11,6 +6,7 @@ import umqtt.robust as mqtt
 
 from machine import Pin
 
+from tempmonitor.common import macaddr
 from tempmonitor import sleep
 
 sta_if = network.WLAN(network.STA_IF)
@@ -63,10 +59,8 @@ class Monitor():
         print('* configured with ip', sta_if.ifconfig()[0])
 
     def init_mqtt(self):
-        mac = sta_if.config('mac')
         server = self.config['mqtt_server']
-
-        self.mqtt_id = binascii.hexlify(mac).decode('utf8')
+        self.mqtt_id = macaddr()
         print('* reporting to {} as {}'.format(
             server, self.mqtt_id))
 

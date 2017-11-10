@@ -8,7 +8,8 @@ SRCS = boot.py \
        tempmonitor/monitor.py \
        tempmonitor/sleep.py \
        tempmonitor/battery.py \
-       config.json
+       config.json \
+       tempmonitor/common.py
 
 all:
 
