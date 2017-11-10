@@ -35,3 +35,6 @@ endif
 
 clean:
 	rm -f .lastbuild
+
+refresh: clean
+	$(AMPY) rmdir tempmonitor
