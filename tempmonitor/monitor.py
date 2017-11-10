@@ -24,6 +24,11 @@ class Monitor():
         sample = next(self.sample())
 
         for k, v in sample.items():
+            if 'calibration' in self.config:
+                cal = self.config['calibration'].get(k, 0)
+                print('# calibration = {}'.format(cal))
+                v += cal
+
             topic = 'sensor/{}/{}'.format(
                 self.mqtt_id, k)
             value = bytes(str(v), 'utf8')
