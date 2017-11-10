@@ -66,12 +66,12 @@ class Monitor():
         mac = sta_if.config('mac')
         server = self.config['mqtt_server']
 
-        mqtt_id = binascii.hexlify(mac).decode('utf8')
+        self.mqtt_id = binascii.hexlify(mac).decode('utf8')
         print('* reporting to {} as {}'.format(
-            server, mqtt_id))
+            server, self.mqtt_id))
 
         print('# connecting to mqtt server {}'.format(server))
-        client = mqtt.MQTTClient(mqtt_id,
+        client = mqtt.MQTTClient(self.mqtt_id,
                                  self.config['mqtt_server'])
         try:
             client.connect()
