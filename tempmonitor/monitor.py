@@ -1,4 +1,8 @@
-import binascii
+try:
+    import binascii
+except ImportError:
+    import ubinascii as binascii
+
 import dht
 import machine
 import network
@@ -29,9 +33,16 @@ class Monitor():
             value = bytes(str(v), 'utf8')
 
             print('* reporting {} = {}'.format(topic, value))
-            self.mqtt_client.publish(topic, value)
+
+            try:
+                self.mqtt_client.publish(topic, value)
+            except OSError:
+                print('! failed to publish data')
 
         self.mqtt_client.disconnect()
+        self.finish()
+
+    def finish(self):
         sleep.deepsleep(int(self.config['interval']))
 
     def init_network(self):
@@ -62,7 +73,11 @@ class Monitor():
         print('# connecting to mqtt server {}'.format(server))
         client = mqtt.MQTTClient(mqtt_id,
                                  self.config['mqtt_server'])
-        client.connect()
+        try:
+            client.connect()
+        except OSError:
+            print('! failed to connect to client')
+            self.finish()
         print('# connected to mqtt server {}'.format(server))
 
         self.mqtt_client = client
@@ -70,7 +85,7 @@ class Monitor():
     def init_dht(self):
         dht_pin = self.config['dht_pin']
         print('* temperature sensor on pin {}'.format(dht_pin))
-        self.dht = dht.DHT(Pin(dht_pin))
+        self.dht = dht.DHT22(Pin(dht_pin))
 
     def sample(self):
         while True:
