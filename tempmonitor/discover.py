@@ -3,7 +3,6 @@ from machine import Pin
 import network
 import select
 import socket
-import time
 
 from tempmonitor.common import macaddr
 

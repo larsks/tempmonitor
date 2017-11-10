@@ -2,4 +2,6 @@ from tempmonitor import testcase
 
 
 class TestSleep(testcase.MPTestCase):
-    pass
+
+    def test_dummy(self):
+        pass
