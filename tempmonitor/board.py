@@ -69,7 +69,7 @@ class Board():
 
         self.dht.measure()
         self._dht_last_read = time.time()
-        return dht.temperature(), dht.humidity()
+        return self.dht.temperature(), self.dht.humidity()
 
     def read_dht(self):
         while True:
