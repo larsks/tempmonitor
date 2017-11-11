@@ -24,10 +24,10 @@ class Monitor():
 
     def run(self):
         self.board.led_on()
-        self.init_network()
-        self.init_mqtt()
 
         try:
+            self.init_network()
+            self.init_mqtt()
             self.sample_and_report()
         except OSError as err:
             print('! failed to sample and report data ({})'.format(err))
