@@ -81,12 +81,9 @@ class Monitor():
         server = self.config['mqtt_server']
         self.mqtt_id = 'sensor-{}'.format(self.board.id())
 
-        print('* reporting to {} as {}'.format(
-            server, self.mqtt_id))
-
+        print('* reporting to {} as {}'.format(server, self.mqtt_id))
         print('# connecting to mqtt server {}'.format(server))
-        client = mqtt.MQTTClient(self.mqtt_id,
-                                 self.config['mqtt_server'])
+        client = mqtt.MQTTClient(self.mqtt_id, self.config['mqtt_server'])
         client.connect()
         print('# connected to mqtt server {}'.format(server))
 
