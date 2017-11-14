@@ -4,10 +4,12 @@ AMPY = ampy -p $(PORT)
 CONFIG = config.json
 SRCS = boot.py \
        main.py \
+       main_stage2.py \
        hwconf.py \
+       board.py \
+       otaserver.py \
        tempmonitor/__init__.py \
        tempmonitor/board.py \
-       tempmonitor/discover.py \
        tempmonitor/monitor.py
 
 all:
