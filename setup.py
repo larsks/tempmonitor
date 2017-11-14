@@ -10,5 +10,11 @@ setup(
     url='https://github.com/larsks/tempmonitor',
     packages=[
         'dhtmanager',
+    ],
+    install_requires=[
+        'flask',
+        'pony',
+        'psycopg2',
+        'psycopg2cffi'
     ]
 )
