@@ -8,5 +8,7 @@ setup(
     description='micropython based wireless temperature/humidity monitoring',
     license='GPLv3',
     url='https://github.com/larsks/tempmonitor',
-    packages=find_packages(),
+    packages=[
+        'dhtmanager',
+    ]
 )
