@@ -56,11 +56,12 @@ def wait_for_connection():
     global config
 
     print('* waiting for wifi')
-    time_start = time.time()
+    time_start = time.ticks_ms()
     while not board.sta_if.isconnected():
         time.sleep(1)
-        time_now = time.time()
-        if time_now - time_start > config['wifi_connection_timeout']:
+        time_now = time.ticks_ms()
+        if (time.ticks_diff(time_now, time_start)/1000 >=
+                config['wifi_connection_timeout']):
             raise TimeoutError()
 
 
