@@ -51,7 +51,7 @@ class Monitor():
             'sensor_id': self.board.id(),
         })
 
-        topic = '{topic}/{id}'.format(
+        topic = '{topic}/dht/{id}'.format(
             id=self.board.id(), **self.config)
         value = json.dumps(sample)
 
