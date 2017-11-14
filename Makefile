@@ -1,23 +1,29 @@
-PORT = /dev/ttyUSB1
-AMPY = ampy -p $(PORT)
+TARGET = /dev/ttyUSB0
+AMPY = ampy -p $(TARGET)
 
 CONFIG = config.json
-SRCS = boot.py \
-       main.py \
-       main_stage2.py \
-       hwconf.py \
-       board.py \
-       otaserver.py \
-       tempmonitor/__init__.py \
-       tempmonitor/board.py \
-       tempmonitor/monitor.py
+TEMPMONITOR_FILES = \
+	boot.py	\
+	main.py	\
+	main_stage2.py	\
+	hwconf.py	\
+	board.py	\
+	otaserver.py	\
+	tempmonitor/__init__.py	\
+	tempmonitor/board.py	\
+	tempmonitor/monitor.py	\
+
+NOGGIN_FILES = \
+	noggin/__init__.py \
+	noggin/app.py \
+	noggin/http.py
 
 all:
 
 check:
 	tox
 
-install: .lastbuild
+install: install-tempmonitor install-noggin
 
 install-config:
 	$(AMPY) put $(CONFIG) config.json
@@ -28,15 +34,25 @@ ifdef DEVICE
 		$(AMPY) put hwconf_$(DEVICE).py hwconf_local.py ||:
 endif
 
-.lastbuild: $(SRCS)
+install-tempmonitor: .lastinstall-tempmonitor
+install-noggin: .lastinstall-noggin
+
+.lastinstall-tempmonitor: $(TEMPMONITOR_FILES)
 	$(AMPY) mkdir --exists-okay tempmonitor
 	for src in $?; do \
 		$(AMPY) put $$src $$src; \
 	done
-	date > .lastbuild
+	date > $@
+
+.lastinstall-noggin: $(addprefix noggin/,$(NOGGIN_FILES))
+	$(AMPY) mkdir --exists-okay noggin
+	for src in $(NOGGIN_FILES); do \
+		$(AMPY) put noggin/$$src $$src; \
+	done
+	date > $@
 
 clean:
-	rm -f .lastbuild
+	rm -f .lastinstall-noggin .lastinstall-tempmonitor
 
 refresh: clean
 	$(AMPY) rmdir tempmonitor

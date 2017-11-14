@@ -1,0 +1,3 @@
+[submodule "noggin"]
+	path = noggin
+	url = https://github.com/larsks/micropython-noggin

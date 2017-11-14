@@ -131,3 +131,4 @@ if want_ota_mode:
 else:
     print('* starting main app')
     import main_stage2
+    main_stage2.main(config)

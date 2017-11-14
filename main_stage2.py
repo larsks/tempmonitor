@@ -1,3 +1,6 @@
-from tempmonitor import Monitor
-m = Monitor()
-m.run()
+from tempmonitor.monitor import Monitor
+
+
+def main(config):
+    m = Monitor(config)
+    m.run()
