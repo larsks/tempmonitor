@@ -67,11 +67,18 @@ class Monitor():
         if ap_if.active():
             ap_if.active(False)
 
+        need_connect = False
         if not sta_if.active():
+            need_connect = True
             sta_if.active(True)
+            while not sta_if.active():
+                machine.idle()
+
+        # don't re-connect on every wake
+        if need_connect or machine.reset_cause() != machine.DEEPSLEEP_RESET:
+            sta_if.connect(self.config['ssid'])
 
         if not sta_if.isconnected():
-            sta_if.connect(self.config['ssid'])
             while not sta_if.isconnected():
                 machine.idle()
 
