@@ -35,20 +35,25 @@ def load_config():
 def stop_ap():
     global config
 
-    print('* stopping access point')
-    board.ap_if.active(False)
-    while board.ap_if.active():
-        machine.idle
+    if board.ap_if.active():
+        print('* stopping access point')
+        board.ap_if.active(False)
+        while board.ap_if.active():
+            machine.idle
 
 
 def start_ap():
     global config
 
-    print('* starting access point')
-    board.ap_if.active(True)
-    while not board.ap_if.active():
-        machine.idle
-    board.ap_if.config(essid=config['ap_wifi_ssid'])
+    if not board.ap_if.active():
+        print('* starting access point')
+        board.ap_if.active(True)
+        while not board.ap_if.active():
+            machine.idle
+
+    print('* configuring access point')
+    if board.ap_if.config('essid') != config['ap_wifi_ssid']:
+        board.ap_if.config(essid=config['ap_wifi_ssid'])
     board.ap_if.config(password=config['ap_wifi_password'])
 
 
@@ -130,6 +135,9 @@ if want_ota_mode:
     import otaserver
     otaserver.serve()
 else:
-    print('* starting main app')
-    import main_stage2
-    main_stage2.main(config)
+    try:
+        import main_stage2
+        print('* starting main app')
+        main_stage2.main(config)
+    except ImportError:
+        print('* nothing to do.')
